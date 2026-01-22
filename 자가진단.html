@@ -1,0 +1,1053 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>개인파산 신청자격 자가진단</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b1220">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    :root { --bg:#0b1220; --card:#121a2b; --text:#e9eefc; --muted:#a9b5d1; --accent:#4dd6ff; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #132042 0%, var(--bg) 55%, #050811 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    .app { width: min(920px, 100%); }
+    .header { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin-bottom: 16px; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: 20px; letter-spacing: -0.2px; }
+    .sub { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.4; max-width: 720px; }
+
+    .card {
+      background: color-mix(in oklab, var(--card) 92%, black);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 20px 80px rgba(0,0,0,0.45);
+    }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .pill { font-size: 12px; color: var(--muted); padding: 6px 10px; border: 1px solid rgba(255,255,255,0.10); border-radius: 999px; }
+    .progress {
+      height: 10px; background: rgba(255,255,255,0.08);
+      border-radius: 999px; overflow: hidden; flex:1;
+      border: 1px solid rgba(255,255,255,0.08);
+      min-width: 180px;
+    }
+    .bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent), #7cffd9); border-radius: 999px; transition: width .25s ease; }
+    .qtitle { font-size: 18px; margin: 8px 0 10px; letter-spacing: -0.2px; }
+    .qdesc { margin: 0 0 14px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 780px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .row { display:flex; flex-direction:column; gap:8px; padding: 12px; border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; background: rgba(255,255,255,0.03); }
+    label { font-size: 13px; color: var(--muted); }
+    input[type="text"], input[type="number"], input[type="tel"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.25);
+      color: var(--text);
+      outline: none;
+    }
+    textarea { min-height: 92px; resize: vertical; }
+
+    .btns { display:flex; gap:10px; justify-content:space-between; margin-top: 14px; flex-wrap: wrap; }
+    button {
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform .08s ease, background .2s ease, border-color .2s ease;
+      font-weight: 700;
+    }
+    button:hover { background: rgba(255,255,255,0.10); border-color: rgba(255,255,255,0.18); }
+    button:active { transform: scale(0.99); }
+    button.primary { background: linear-gradient(90deg, rgba(77,214,255,0.25), rgba(124,255,217,0.18)); border-color: rgba(77,214,255,0.35); }
+    button.primary:hover { background: linear-gradient(90deg, rgba(77,214,255,0.33), rgba(124,255,217,0.24)); }
+    button.ghost { background: transparent; }
+
+    .small { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.55; }
+    .err { color: #ffd1d9; font-size: 12px; margin-top: 8px; display:none; }
+    .result { display:none; margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.10); padding-top: 14px; }
+
+    .scoreBox { display:flex; gap:12px; align-items:stretch; flex-wrap: wrap; }
+    .badge {
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      min-width: 220px;
+      flex: 1;
+    }
+    .badge .k { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .badge .v { font-size: 18px; font-weight: 900; letter-spacing: -0.2px; }
+
+    .hintList { margin: 12px 0 0; padding-left: 18px; color: var(--text); }
+    .hintList li { margin: 6px 0; color: var(--muted); }
+
+    .flex { display:flex; gap:10px; align-items:center; flex-wrap: wrap; }
+    .toggle { display:flex; gap:10px; flex-wrap: wrap; }
+    .chip {
+      user-select:none;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      cursor:pointer;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .chip[data-on="true"] { border-color: rgba(77,214,255,0.55); background: rgba(77,214,255,0.14); }
+
+    .footerNote { margin-top: 14px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .codebox {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(0,0,0,0.35);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #d7e3ff;
+    }
+    .divider { height:1px; background: rgba(255,255,255,0.10); margin: 14px 0; }
+
+    .installBanner {
+      display:none;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(77,214,255,0.10);
+      margin-top: 10px;
+    }
+    .installBanner strong { color: #dff7ff; }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="header">
+      <div>
+        <h1>개인파산 신청자격 자가진단</h1>
+        <p class="sub">설문 응답을 바탕으로 “가능성(참고용)”을 가늠합니다. 최종 판단은 사건별 사정/법원 실무에 따라 달라질 수 있어요.</p>
+
+        <div class="installBanner" id="installBanner">
+          <div class="flex" style="justify-content:space-between; width:100%;">
+            <div><strong>앱으로 설치</strong>하면 오프라인에서도 더 빠르게 열려요.</div>
+            <button class="primary" id="installBtn">설치</button>
+          </div>
+          <div class="small">※ 크롬/엣지에서 “설치” 또는 “홈 화면에 추가”가 가능합니다.</div>
+        </div>
+      </div>
+      <div class="pill" id="statusPill">준비됨</div>
+    </div>
+
+    <div class="card">
+      <div class="topbar">
+        <div class="progress" aria-label="진행률"><div class="bar" id="bar"></div></div>
+        <div class="pill"><span id="stepText">1</span> / 10</div>
+        <div class="pill" id="onlinePill">상태: 확인중…</div>
+      </div>
+
+      <div id="questionArea"></div>
+
+      <div class="btns">
+        <button class="ghost" id="backBtn">이전</button>
+        <div class="flex">
+          <button class="ghost" id="resetBtn" title="처음부터">초기화</button>
+          <button class="primary" id="nextBtn">다음</button>
+        </div>
+      </div>
+
+      <div class="err" id="errBox">입력값을 확인해 주세요.</div>
+
+      <div class="result" id="resultArea">
+        <h2 class="qtitle" style="margin-top:6px;">결과</h2>
+        <p class="qdesc" id="resultDesc"></p>
+
+        <div class="scoreBox">
+          <div class="badge">
+            <div class="k">종합 레벨(참고용)</div>
+            <div class="v" id="levelText">-</div>
+          </div>
+          <div class="badge">
+            <div class="k">점수(0~100)</div>
+            <div class="v" id="scoreText">-</div>
+          </div>
+          <div class="badge">
+            <div class="k">리스크 포인트</div>
+            <div class="v" id="riskText">-</div>
+          </div>
+        </div>
+
+        <ul class="hintList" id="hints"></ul>
+
+        <div class="divider"></div>
+
+        <h2 class="qtitle" style="margin-top:0;">상담 요청(선택)</h2>
+        <p class="qdesc">
+          이름/전화번호를 남기면, 아래 버튼으로 <b>메일 작성창이 열리고</b> 상담 신청 내용이 자동으로 채워집니다.<br>
+          ※ 이 페이지는 서버로 자동 전송하지 않고, <b>이 기기(브라우저)에만</b> 저장됩니다.
+        </p>
+
+        <div class="grid">
+          <div class="row">
+            <label>이름</label>
+            <input type="text" id="lead_name" placeholder="예: 홍길동">
+          </div>
+          <div class="row">
+            <label>전화번호</label>
+            <input type="tel" id="lead_phone" placeholder="예: 01012345678" inputmode="tel">
+            <div class="small">하이픈(-) 없이 입력해도 됩니다.</div>
+          </div>
+          <div class="row" style="grid-column:1/-1;">
+            <label>메모(선택)</label>
+            <textarea id="lead_memo" placeholder="예: 현재 통장압류, 월소득 180만원, 부양 2명 등"></textarea>
+          </div>
+        </div>
+
+        <div class="btns">
+          <button id="saveLeadBtn" class="primary">상담정보 저장</button>
+          <button id="copyRequestBtn">상담 요청 내용 복사</button>
+          <button id="sendEmailBtn" class="primary">이메일로 상담신청 보내기</button>
+          <button id="clearLeadBtn" class="ghost">상담정보 삭제</button>
+        </div>
+
+        <div class="footerNote">
+          <div class="flex" style="justify-content:space-between;">
+            <div>응답 데이터(JSON)도 함께 복사해 상담/저장에 활용할 수 있어요.</div>
+            <button id="copyJsonBtn">JSON 복사</button>
+          </div>
+          <div class="codebox" id="jsonBox"></div>
+          <div class="small" id="leadSavedHint" style="display:none;">✅ 상담정보가 저장되었습니다(이 기기에서만).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/** ✅ 안전 헬퍼: 요소가 있을 때만 이벤트 바인딩 */
+const $ = (id) => document.getElementById(id);
+const on = (id, evt, fn) => { const el = $(id); if (el) el.addEventListener(evt, fn); };
+
+/** PWA */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try { await navigator.serviceWorker.register("./sw.js"); } catch (e) {}
+  });
+}
+
+/** 온라인/오프라인 */
+const onlinePill = $("onlinePill");
+function updateOnline() { if (onlinePill) onlinePill.textContent = "상태: " + (navigator.onLine ? "온라인" : "오프라인"); }
+window.addEventListener("online", updateOnline);
+window.addEventListener("offline", updateOnline);
+updateOnline();
+
+/** 설치 배너 */
+let deferredPrompt = null;
+const installBanner = $("installBanner");
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBanner) installBanner.style.display = "block";
+});
+on("installBtn", "click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  if (installBanner) installBanner.style.display = "none";
+});
+
+/** 만원 <-> 원 */
+const toWon = (man) => {
+  if (man === null || man === undefined || man === "") return null;
+  const x = Number(man);
+  if (Number.isNaN(x)) return null;
+  return Math.round(x * 10000);
+};
+const fromWonToMan = (won) => {
+  if (won === null || won === undefined || won === "") return "";
+  const x = Number(won);
+  if (Number.isNaN(x)) return "";
+  return Math.round(x / 10000);
+};
+const KRW = (won) => {
+  if (won === null || won === undefined || won === "") return "";
+  const x = Number(won);
+  if (Number.isNaN(x)) return "";
+  return x.toLocaleString("ko-KR");
+};
+const MAN_FMT = (man) => {
+  if (man === null || man === undefined || man === "") return "";
+  const x = Number(man);
+  if (Number.isNaN(x)) return "";
+  return x.toLocaleString("ko-KR");
+};
+
+/** 상태 */
+const state = {
+  step: 0,
+  answers: {
+    q1_insolvent: null,
+    q2_totalDebt: null,       // 원
+    q3_monthIncome: null,     // 원
+    q3_incomeType: "무소득",
+    q4_dependents: null,
+    q5_hasAssets: null,
+    q5_assetsTypes: [],
+    q5_assetsTotal: null,     // 원
+    q6_disposal: null,
+    q6_monthsAgo: null,
+    q6_disposalType: [],
+    q6_disposalAmount: null,  // 원
+    q7_preferentialPay: null,
+    q7_target: "가족·지인",
+    q7_amount: null,          // 원
+    q8_cause: "생활비 부족(소득감소/실직)",
+    q8_other: "",
+    q9_history: "없음",
+    q9_year: "",
+    q10_enforcement: null,
+    q10_types: []
+  }
+};
+
+function val(key){ return state.answers[key] ?? ""; }
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+/** 입력 중 재렌더링 방지: 미리보기만 업데이트 */
+function updateMoneyPreview(id, manValue){
+  const manSpan = $(id + "_preview_man");
+  const wonSpan = $(id + "_preview_won");
+  if (!manSpan || !wonSpan) return;
+
+  const won = toWon(manValue);
+  manSpan.textContent = MAN_FMT(manValue);
+  wonSpan.textContent = won ? `(=${KRW(won)} 원)` : "";
+}
+function updatePlainPreview(id, value, unit){
+  const span = $(id + "_preview_plain");
+  if (!span) return;
+  span.textContent = (value === null || value === undefined || value === "") ? "" : `${value} ${unit}`;
+}
+
+/** UI */
+function yesNo(key){
+  const v = val(key);
+  return `
+    <div class="row">
+      <label>선택</label>
+      <div class="toggle" role="group" aria-label="예/아니오 선택">
+        <span class="chip" data-yesno="${key}" data-value="yes" data-on="${v==="yes"}">예</span>
+        <span class="chip" data-yesno="${key}" data-value="no" data-on="${v==="no"}">아니오</span>
+      </div>
+      <div class="small">빠르게 체크하는 질문이에요.</div>
+    </div>
+  `;
+}
+
+function numberInputMan(key, placeholder){
+  const currentMan = fromWonToMan(val(key));
+  const won = toWon(currentMan);
+  return `
+    <div class="row">
+      <label>숫자 입력 (만원)</label>
+      <input type="number" min="0" step="1" id="${key}" placeholder="${placeholder}" value="${currentMan}">
+      <div class="small">
+        입력값:
+        <span id="${key}_preview_man">${currentMan !== "" ? MAN_FMT(currentMan) : ""}</span>
+        만원
+        <span id="${key}_preview_won">${won ? `(=${KRW(won)} 원)` : ""}</span>
+      </div>
+    </div>
+  `;
+}
+
+function numberInputPlain(key, placeholder, unit){
+  const v = val(key);
+  return `
+    <div class="row">
+      <label>숫자 입력 (${escapeHtml(unit)})</label>
+      <input type="number" min="0" step="1" id="${key}" placeholder="${escapeHtml(placeholder)}" value="${v ?? ""}">
+      <div class="small">
+        입력값: <span id="${key}_preview_plain">${(v ?? "") !== "" ? `${v} ${unit}` : ""}</span>
+      </div>
+    </div>
+  `;
+}
+
+function chips(key, items){
+  const selected = new Set(state.answers[key] || []);
+  return `
+    <div class="toggle">
+      ${items.map(x => `<span class="chip" data-chip="${key}" data-value="${escapeHtml(x)}" data-on="${selected.has(x)}">${escapeHtml(x)}</span>`).join("")}
+    </div>
+  `;
+}
+
+function watchYesNo(key, targetId){
+  const chipsEls = document.querySelectorAll(`[data-yesno="${key}"]`);
+  const box = $(targetId);
+  if (!box) return;
+  chipsEls.forEach(ch => ch.addEventListener("click", () => {
+    const v = ch.getAttribute("data-value");
+    box.style.display = (v === "yes") ? "block" : "none";
+  }));
+}
+
+/** 질문 */
+const steps = [
+  { title:"1) 현재 상환이 사실상 불가능한 상태인가요?", desc:"연체 중이거나 정상 상환을 지속하기 어려운 상태인지 확인합니다.", render: () => yesNo("q1_insolvent") },
+  { title:"2) 총 채무액(원금 기준)은 대략 얼마인가요?", desc:"입력은 ‘만원’ 단위입니다.", render: () => numberInputMan("q2_totalDebt","예: 3500 (=3,500만원)") },
+  {
+    title:"3) 최근 3개월 평균 ‘세후’ 월소득은 얼마인가요?",
+    desc:"입력은 ‘만원’ 단위입니다. (무소득이면 0)",
+    render: () => `
+      <div class="grid">
+        <div class="row">
+          <label>월소득(세후) (만원)</label>
+          <input type="number" min="0" step="1" id="q3_monthIncome" placeholder="예: 180 (=180만원)" value="${fromWonToMan(val("q3_monthIncome"))}">
+          <div class="small">
+            입력값:
+            <span id="q3_monthIncome_preview_man">${fromWonToMan(val("q3_monthIncome")) !== "" ? MAN_FMT(fromWonToMan(val("q3_monthIncome"))) : ""}</span>
+            만원
+            <span id="q3_monthIncome_preview_won">${val("q3_monthIncome") ? `(=${KRW(val("q3_monthIncome"))} 원)` : ""}</span>
+          </div>
+        </div>
+        <div class="row">
+          <label>소득 형태</label>
+          <select id="q3_incomeType">
+            ${["무소득","알바·일용","직장인","자영업","기타"].map(x => `<option ${val("q3_incomeType")===x?"selected":""}>${x}</option>`).join("")}
+          </select>
+          <div class="small">자료 준비(급여명세/원천징수/매출자료 등)에 영향이 있어요.</div>
+        </div>
+      </div>
+    `
+  },
+  { title:"4) 부양가족 수는 몇 명인가요?", desc:"여기서는 ‘본인 제외 부양가족 수’를 입력해 주세요.", render: () => numberInputPlain("q4_dependents","예: 2","명") },
+  {
+    title:"5) 보유 재산이 있나요?",
+    desc:"재산 총액 입력은 ‘만원’ 단위입니다.",
+    render: () => `
+      ${yesNo("q5_hasAssets")}
+      <div id="q5_more" style="display:${val("q5_hasAssets")==="yes"?"block":"none"}; margin-top:12px;">
+        <div class="grid">
+          <div class="row">
+            <label>재산 종류(복수 선택)</label>
+            ${chips("q5_assetsTypes", ["부동산","자동차","예금","보험해약환급금","주식·코인","기타"])}
+          </div>
+          <div class="row">
+            <label>재산 총액(대략) (만원)</label>
+            <input type="number" min="0" step="1" id="q5_assetsTotal" placeholder="예: 1200 (=1,200만원)" value="${fromWonToMan(val("q5_assetsTotal"))}">
+            <div class="small">
+              입력값:
+              <span id="q5_assetsTotal_preview_man">${fromWonToMan(val("q5_assetsTotal")) !== "" ? MAN_FMT(fromWonToMan(val("q5_assetsTotal"))) : ""}</span>
+              만원
+              <span id="q5_assetsTotal_preview_won">${val("q5_assetsTotal") ? `(=${KRW(val("q5_assetsTotal"))} 원)` : ""}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    afterRender: () => watchYesNo("q5_hasAssets","q5_more")
+  },
+  {
+    title:"6) 최근 1~2년 내 재산 처분(매각/증여 등)이 있었나요?",
+    desc:"처분 금액 입력은 ‘만원’ 단위입니다.",
+    render: () => `
+      ${yesNo("q6_disposal")}
+      <div id="q6_more" style="display:${val("q6_disposal")==="yes"?"block":"none"}; margin-top:12px;">
+        <div class="grid">
+          <div class="row">
+            <label>처분 시기(개월 전)</label>
+            <input type="number" min="0" step="1" id="q6_monthsAgo" placeholder="예: 8" value="${val("q6_monthsAgo") ?? ""}">
+            <div class="small">입력값: <span id="q6_monthsAgo_preview_plain">${(val("q6_monthsAgo") ?? "") !== "" ? `${val("q6_monthsAgo")} 개월` : ""}</span></div>
+          </div>
+          <div class="row">
+            <label>처분 금액(대략) (만원)</label>
+            <input type="number" min="0" step="1" id="q6_disposalAmount" placeholder="예: 500 (=500만원)" value="${fromWonToMan(val("q6_disposalAmount"))}">
+            <div class="small">
+              입력값:
+              <span id="q6_disposalAmount_preview_man">${fromWonToMan(val("q6_disposalAmount")) !== "" ? MAN_FMT(fromWonToMan(val("q6_disposalAmount"))) : ""}</span>
+              만원
+              <span id="q6_disposalAmount_preview_won">${val("q6_disposalAmount") ? `(=${KRW(val("q6_disposalAmount"))} 원)` : ""}</span>
+            </div>
+          </div>
+          <div class="row" style="grid-column:1/-1;">
+            <label>처분 종류(복수 선택)</label>
+            ${chips("q6_disposalType", ["부동산","자동차","예금/현금","보험해약","증여","기타"])}
+          </div>
+        </div>
+      </div>
+    `,
+    afterRender: () => watchYesNo("q6_disposal","q6_more")
+  },
+  {
+    title:"7) 최근 1년 내 특정 채권자에게만 먼저 갚은 적이 있나요?",
+    desc:"금액 입력은 ‘만원’ 단위입니다.",
+    render: () => `
+      ${yesNo("q7_preferentialPay")}
+      <div id="q7_more" style="display:${val("q7_preferentialPay")==="yes"?"block":"none"}; margin-top:12px;">
+        <div class="grid">
+          <div class="row">
+            <label>대상</label>
+            <select id="q7_target">
+              ${["가족·지인","금융사(카드/대출)","대부업체","기타"].map(x => `<option ${val("q7_target")===x?"selected":""}>${x}</option>`).join("")}
+            </select>
+          </div>
+          <div class="row">
+            <label>금액(대략) (만원)</label>
+            <input type="number" min="0" step="1" id="q7_amount" placeholder="예: 200 (=200만원)" value="${fromWonToMan(val("q7_amount"))}">
+            <div class="small">
+              입력값:
+              <span id="q7_amount_preview_man">${fromWonToMan(val("q7_amount")) !== "" ? MAN_FMT(fromWonToMan(val("q7_amount"))) : ""}</span>
+              만원
+              <span id="q7_amount_preview_won">${val("q7_amount") ? `(=${KRW(val("q7_amount"))} 원)` : ""}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    afterRender: () => watchYesNo("q7_preferentialPay","q7_more")
+  },
+  {
+    title:"8) 빚의 주요 원인은 무엇인가요?",
+    desc:"면책 심사에서 자주 질문되는 항목입니다. 가장 가까운 1개를 선택하세요.",
+    render: () => `
+      <div class="grid">
+        <div class="row" style="grid-column:1/-1;">
+          <label>주요 원인</label>
+          <select id="q8_cause">
+            ${[
+              "생활비 부족(소득감소/실직)",
+              "사업실패/폐업",
+              "질병/사고/간병",
+              "보증/연대보증",
+              "투자(주식·코인)",
+              "도박",
+              "기타(직접 입력)"
+            ].map(x => `<option ${val("q8_cause")===x?"selected":""}>${x}</option>`).join("")}
+          </select>
+        </div>
+        <div class="row" id="q8_more" style="display:${val("q8_cause")==="기타(직접 입력)"?"block":"none"}; grid-column:1/-1;">
+          <label>기타 사유</label>
+          <input type="text" id="q8_other" placeholder="예: 가족 부양, 급작스런 이사비용 등" value="${escapeHtml(val("q8_other"))}">
+        </div>
+      </div>
+    `,
+    afterRender: () => {
+      const sel = $("q8_cause");
+      const box = $("q8_more");
+      if (!sel || !box) return;
+      sel.addEventListener("change", () => box.style.display = sel.value === "기타(직접 입력)" ? "block" : "none");
+    }
+  },
+  {
+    title:"9) 최근 5~10년 내 파산면책/회생인가 이력이 있나요?",
+    desc:"이력이 있으면 시기를 함께 기록합니다.",
+    render: () => `
+      <div class="grid">
+        <div class="row">
+          <label>이력</label>
+          <select id="q9_history">
+            ${["없음","파산면책","회생인가","진행중"].map(x => `<option ${val("q9_history")===x?"selected":""}>${x}</option>`).join("")}
+          </select>
+        </div>
+        <div class="row" id="q9_more" style="display:${val("q9_history")==="없음"?"none":"block"};">
+          <label>시기(년도)</label>
+          <input type="number" min="1900" max="2100" step="1" id="q9_year" placeholder="예: 2021" value="${escapeHtml(val("q9_year"))}">
+          <div class="small">입력값: <span id="q9_year_preview_plain">${(val("q9_year") ?? "") !== "" ? `${val("q9_year")} 년` : ""}</span></div>
+        </div>
+      </div>
+    `,
+    afterRender: () => {
+      const sel = $("q9_history");
+      const box = $("q9_more");
+      if (!sel || !box) return;
+      sel.addEventListener("change", () => box.style.display = sel.value === "없음" ? "none" : "block");
+    }
+  },
+  {
+    title:"10) 압류/강제집행/소송/독촉이 진행 중인가요?",
+    desc:"있다면 어떤 종류인지 체크해 주세요.",
+    render: () => `
+      ${yesNo("q10_enforcement")}
+      <div id="q10_more" style="display:${val("q10_enforcement")==="yes"?"block":"none"}; margin-top:12px;">
+        <div class="row">
+          <label>종류(복수 선택)</label>
+          ${chips("q10_types", ["급여압류","통장압류","부동산압류","차량압류","소송/지급명령","독촉/추심","기타"])}
+        </div>
+      </div>
+    `,
+    afterRender: () => watchYesNo("q10_enforcement","q10_more")
+  }
+];
+
+/** 바인딩 */
+function bindCommonHandlers(){
+  document.querySelectorAll("[data-yesno]").forEach(ch => {
+    ch.addEventListener("click", () => {
+      const key = ch.getAttribute("data-yesno");
+      const v = ch.getAttribute("data-value");
+      state.answers[key] = v;
+      document.querySelectorAll(`[data-yesno="${key}"]`)
+        .forEach(el => el.setAttribute("data-on", String(el.getAttribute("data-value")===v)));
+      renderStep(); // 클릭은 재렌더 OK
+    });
+  });
+
+  document.querySelectorAll("[data-chip]").forEach(ch => {
+    ch.addEventListener("click", () => {
+      const key = ch.getAttribute("data-chip");
+      const v = ch.getAttribute("data-value");
+      const arr = new Set(state.answers[key] || []);
+      if (arr.has(v)) arr.delete(v); else arr.add(v);
+      state.answers[key] = Array.from(arr);
+      ch.setAttribute("data-on", String(arr.has(v)));
+    });
+  });
+
+  const ids = [
+    "q2_totalDebt","q3_monthIncome","q3_incomeType","q4_dependents",
+    "q5_assetsTotal","q6_monthsAgo","q6_disposalAmount","q7_target","q7_amount",
+    "q8_cause","q8_other","q9_history","q9_year"
+  ];
+
+  ids.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+
+    const onInput = () => {
+      if (el.type === "number") {
+        const raw = el.value === "" ? null : Number(el.value);
+
+        if (id === "q4_dependents" || id === "q6_monthsAgo" || id === "q9_year") {
+          state.answers[id] = raw;
+          if (id === "q4_dependents") updatePlainPreview("q4_dependents", raw, "명");
+          if (id === "q6_monthsAgo") updatePlainPreview("q6_monthsAgo", raw, "개월");
+          if (id === "q9_year") updatePlainPreview("q9_year", raw, "년");
+          return;
+        }
+
+        state.answers[id] = (raw === null) ? null : toWon(raw);
+        updateMoneyPreview(id, raw);
+        return;
+      }
+
+      state.answers[id] = el.value;
+    };
+
+    el.addEventListener("input", onInput);
+    el.addEventListener("change", onInput);
+  });
+}
+
+function setError(msg){
+  const box = $("errBox");
+  if (!box) return;
+  box.textContent = msg;
+  box.style.display = "block";
+}
+function clearError(){
+  const box = $("errBox");
+  if (!box) return;
+  box.style.display = "none";
+}
+
+/** 유효성 */
+function validateStep(i){
+  const a = state.answers;
+  switch(i){
+    case 0:
+      if (a.q1_insolvent !== "yes" && a.q1_insolvent !== "no") return "예/아니오를 선택해 주세요.";
+      return null;
+    case 1:
+      if (a.q2_totalDebt === null || Number.isNaN(Number(a.q2_totalDebt))) return "총 채무액을 입력해 주세요(만원).";
+      return null;
+    case 2:
+      if (a.q3_monthIncome === null || Number.isNaN(Number(a.q3_monthIncome))) return "월소득을 입력해 주세요(만원). (무소득이면 0)";
+      if (!a.q3_incomeType) return "소득 형태를 선택해 주세요.";
+      return null;
+    case 3:
+      if (a.q4_dependents === null || Number.isNaN(Number(a.q4_dependents))) return "부양가족 수를 숫자로 입력해 주세요(없으면 0).";
+      if (a.q4_dependents < 0) return "부양가족 수는 0 이상이어야 합니다.";
+      return null;
+    case 4:
+      if (a.q5_hasAssets !== "yes" && a.q5_hasAssets !== "no") return "재산 유무(예/아니오)를 선택해 주세요.";
+      if (a.q5_hasAssets === "yes"){
+        if (!Array.isArray(a.q5_assetsTypes) || a.q5_assetsTypes.length === 0) return "재산 종류를 1개 이상 선택해 주세요.";
+        if (a.q5_assetsTotal === null || Number.isNaN(Number(a.q5_assetsTotal))) return "재산 총액(대략)을 입력해 주세요(만원).";
+      }
+      return null;
+    case 5:
+      if (a.q6_disposal !== "yes" && a.q6_disposal !== "no") return "재산 처분 유무(예/아니오)를 선택해 주세요.";
+      if (a.q6_disposal === "yes"){
+        if (a.q6_monthsAgo === null || Number.isNaN(Number(a.q6_monthsAgo))) return "처분 시기(개월 전)를 숫자로 입력해 주세요.";
+        if (!Array.isArray(a.q6_disposalType) || a.q6_disposalType.length === 0) return "처분 종류를 1개 이상 선택해 주세요.";
+        if (a.q6_disposalAmount === null || Number.isNaN(Number(a.q6_disposalAmount))) return "처분 금액(대략)을 입력해 주세요(만원).";
+      }
+      return null;
+    case 6:
+      if (a.q7_preferentialPay !== "yes" && a.q7_preferentialPay !== "no") return "편파변제 유무(예/아니오)를 선택해 주세요.";
+      if (a.q7_preferentialPay === "yes"){
+        if (!a.q7_target) return "대상을 선택해 주세요.";
+        if (a.q7_amount === null || Number.isNaN(Number(a.q7_amount))) return "금액(대략)을 입력해 주세요(만원).";
+      }
+      return null;
+    case 7:
+      if (!a.q8_cause) return "주요 원인을 선택해 주세요.";
+      if (a.q8_cause === "기타(직접 입력)" && !String(a.q8_other || "").trim()) return "기타 사유를 입력해 주세요.";
+      return null;
+    case 8:
+      if (!a.q9_history) return "이력 항목을 선택해 주세요.";
+      if (a.q9_history !== "없음" && !String(a.q9_year||"").trim()) return "시기(년도)를 입력해 주세요.";
+      return null;
+    case 9:
+      if (a.q10_enforcement !== "yes" && a.q10_enforcement !== "no") return "진행 중 여부(예/아니오)를 선택해 주세요.";
+      if (a.q10_enforcement === "yes" && (!Array.isArray(a.q10_types) || a.q10_types.length === 0)) return "진행 중인 종류를 1개 이상 선택해 주세요.";
+      return null;
+    default:
+      return null;
+  }
+}
+
+/** 결과 계산(기존 로직 유지) */
+function computeResult(){
+  const a = state.answers;
+  let score = 50;
+  let risk = 0;
+  const hints = [];
+
+  if (a.q1_insolvent === "yes") score += 18;
+  else { score -= 25; hints.push("현재 상환이 가능하다면, 파산보다는 회생/채무조정이 더 적합할 수 있어요."); }
+
+  const debt = Number(a.q2_totalDebt || 0);
+  if (debt >= 100_000_000) score += 10;
+  else if (debt >= 30_000_000) score += 6;
+  else if (debt >= 10_000_000) score += 3;
+  else score -= 2;
+
+  const income = Number(a.q3_monthIncome || 0);
+  if (income === 0) score += 12;
+  else if (income <= 1_200_000) score += 8;
+  else if (income <= 2_500_000) score += 3;
+  else score -= 3;
+
+  const dep = Number(a.q4_dependents || 0);
+  if (dep >= 2) score += 6;
+  else if (dep === 1) score += 3;
+
+  if (a.q5_hasAssets === "yes") {
+    const assets = Number(a.q5_assetsTotal || 0);
+    if (assets >= 50_000_000) { score -= 12; hints.push("보유재산 규모가 큰 경우 환가/배당 이슈가 커질 수 있어요."); }
+    else if (assets >= 10_000_000) score -= 6;
+    else score -= 2;
+  } else if (a.q5_hasAssets === "no") {
+    score += 6;
+  }
+
+  if (a.q6_disposal === "yes") {
+    risk += 18; score -= 6;
+    const m = Number(a.q6_monthsAgo || 0);
+    if (m <= 12) { risk += 6; hints.push("최근 1년 내 재산처분은 소명 요구가 강해질 수 있어요(사용처 정리 필수)."); }
+    else hints.push("재산처분 내역이 있으면 계약서/입금내역/사용처를 정리해 두세요.");
+  }
+
+  if (a.q7_preferentialPay === "yes") {
+    risk += 14; score -= 4;
+    hints.push("특정 채권자에게만 먼저 갚은 내역은 ‘편파변제’로 문제될 수 있어요(사유 정리).");
+  }
+
+  const cause = a.q8_cause;
+  if (cause === "도박") { risk += 22; score -= 10; hints.push("도박 관련 채무는 면책 심사에서 불리할 수 있어요(중단/재발방지 자료 중요)."); }
+  if (cause === "투자(주식·코인)") { risk += 14; score -= 6; hints.push("투자 손실 채무는 거래내역/손실 경위 정리가 핵심이에요."); }
+  if (cause === "사업실패/폐업") { score += 6; hints.push("사업실패라면 폐업사실/매출감소/대출 사용처 정리가 도움이 돼요."); }
+  if (cause === "질병/사고/간병") { score += 8; hints.push("질병·간병 사유라면 진단서/치료비 자료가 강력한 근거가 됩니다."); }
+
+  if (a.q9_history && a.q9_history !== "없음") {
+    risk += 16; score -= 8;
+    hints.push("과거 파산/회생 이력이 있다면, 이후 사정변경(재발 사유) 설명이 중요해요.");
+  }
+
+  if (a.q10_enforcement === "yes") {
+    score += 4;
+    hints.push("압류·추심이 진행 중이면 긴급 대응이 필요할 수 있어요.");
+  }
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  let level = "", desc = "";
+  if (score >= 75) {
+    level = "가능성 높음(참고용)";
+    desc = "현재 입력 기준으로는 개인파산 검토 우선순위가 높은 편입니다. 아래 리스크 포인트를 먼저 정리하면 진행이 더 매끄러워져요.";
+  } else if (score >= 55) {
+    level = "가능성 보통(참고용)";
+    desc = "개인파산도 가능하지만 회생/채무조정과 비교 검토가 필요한 구간입니다.";
+  } else {
+    level = "가능성 낮음(참고용)";
+    desc = "현재 입력 기준으로는 파산보다는 다른 제도가 더 적합할 수 있어요(단, 사정에 따라 달라질 수 있습니다).";
+  }
+
+  let riskText = "낮음";
+  if (risk >= 45) riskText = "높음";
+  else if (risk >= 25) riskText = "중간";
+
+  const uniq = [];
+  for (const h of hints) if (!uniq.includes(h)) uniq.push(h);
+  uniq.push("이 결과는 ‘상담 전 자가진단’용입니다. 사건별로 결론이 달라질 수 있어요.");
+  return { score, risk, riskText, level, desc, hints: uniq.slice(0, 8) };
+}
+
+/** 렌더 */
+function renderStep(opts={silent:false}){
+  const step = state.step;
+  if ($("stepText")) $("stepText").textContent = String(step + 1);
+  if ($("bar")) $("bar").style.width = `${Math.round(((step) / (steps.length)) * 100)}%`;
+
+  const q = steps[step];
+  const qa = $("questionArea");
+  if (qa) {
+    qa.innerHTML = `
+      <div class="qtitle">${escapeHtml(q.title)}</div>
+      <p class="qdesc">${escapeHtml(q.desc)}</p>
+      ${q.render()}
+    `;
+  }
+
+  bindCommonHandlers();
+  if (q.afterRender) q.afterRender();
+
+  if ($("backBtn")) $("backBtn").disabled = step === 0;
+  if ($("nextBtn")) $("nextBtn").textContent = (step === steps.length - 1) ? "결과 보기" : "다음";
+  if ($("resultArea")) $("resultArea").style.display = "none";
+  if (!opts.silent) clearError();
+}
+
+function showResult(){
+  const res = computeResult();
+  if ($("bar")) $("bar").style.width = "100%";
+  if ($("statusPill")) $("statusPill").textContent = "완료";
+
+  if ($("resultDesc")) $("resultDesc").textContent = res.desc;
+  if ($("levelText")) $("levelText").textContent = res.level;
+  if ($("scoreText")) $("scoreText").textContent = String(res.score);
+  if ($("riskText")) $("riskText").textContent = res.riskText;
+
+  if ($("hints")) $("hints").innerHTML = res.hints.map(x => `<li>${escapeHtml(x)}</li>`).join("");
+
+  const payload = { createdAt: new Date().toISOString(), answers: state.answers, result: res };
+  if ($("jsonBox")) $("jsonBox").textContent = JSON.stringify(payload, null, 2);
+
+  loadLead();
+  if ($("resultArea")) $("resultArea").style.display = "block";
+}
+
+/** 상담 저장/복사/메일 */
+const leadKey = "bankruptcy_app_lead_v1";
+const OWNER_EMAIL = "dlion1993@naver.com";
+
+function normalizePhone(p){ return String(p||"").replace(/[^0-9]/g, ""); }
+function sanitizeEmail(s){
+  return String(s || "")
+    .trim()
+    .replace(/[<>]/g, "")
+    .replace(/\s+/g, "")
+    .replace(/;+$/g, "");
+}
+
+function loadLead(){
+  const raw = localStorage.getItem(leadKey);
+  if (!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    if ($("lead_name")) $("lead_name").value = data.name || "";
+    if ($("lead_phone")) $("lead_phone").value = data.phone || "";
+    if ($("lead_memo")) $("lead_memo").value = data.memo || "";
+    if ($("leadSavedHint")) $("leadSavedHint").style.display = "block";
+  }catch(e){}
+}
+
+function saveLead(){
+  const name = String($("lead_name")?.value || "").trim();
+  const phone = normalizePhone($("lead_phone")?.value);
+  const memo = String($("lead_memo")?.value || "").trim();
+
+  if (!name) return { ok:false, msg:"이름을 입력해 주세요." };
+  if (phone.length < 9) return { ok:false, msg:"전화번호를 정확히 입력해 주세요." };
+
+  const data = { name, phone, memo, savedAt: new Date().toISOString() };
+  localStorage.setItem(leadKey, JSON.stringify(data));
+  return { ok:true, data };
+}
+
+function clearLead(){
+  localStorage.removeItem(leadKey);
+  if ($("lead_name")) $("lead_name").value = "";
+  if ($("lead_phone")) $("lead_phone").value = "";
+  if ($("lead_memo")) $("lead_memo").value = "";
+  if ($("leadSavedHint")) $("leadSavedHint").style.display = "none";
+}
+
+function buildRequestText(){
+  const name = String($("lead_name")?.value || "").trim();
+  const phone = normalizePhone($("lead_phone")?.value);
+  const memo = String($("lead_memo")?.value || "").trim();
+
+  const res = computeResult();
+  const debtWon = state.answers.q2_totalDebt || 0;
+  const incomeWon = state.answers.q3_monthIncome || 0;
+  const assetsWon = state.answers.q5_assetsTotal || 0;
+
+  const lines = [];
+  lines.push("[개인파산 상담 요청]");
+  lines.push(`이름: ${name || "-"}`);
+  lines.push(`전화: ${phone || "-"}`);
+  if (memo) lines.push(`메모: ${memo}`);
+  lines.push("");
+  lines.push("[자가진단 요약]");
+  lines.push(`점수: ${res.score} / 레벨: ${res.level} / 리스크: ${res.riskText}`);
+  lines.push(`총채무(원금): ${fromWonToMan(debtWon)}만원 (=${KRW(debtWon)}원)`);
+  lines.push(`월소득(세후): ${fromWonToMan(incomeWon)}만원 (=${KRW(incomeWon)}원) / 소득형태: ${state.answers.q3_incomeType}`);
+  lines.push(`부양가족: ${state.answers.q4_dependents ?? "-"}명(본인 제외)`);
+  lines.push(`재산: ${state.answers.q5_hasAssets==="yes" ? `${fromWonToMan(assetsWon)}만원 (=${KRW(assetsWon)}원)` : (state.answers.q5_hasAssets==="no" ? "없음" : "-")}`);
+  lines.push(`재산처분: ${state.answers.q6_disposal==="yes" ? "있음" : (state.answers.q6_disposal==="no" ? "없음" : "-")}`);
+  lines.push(`편파변제: ${state.answers.q7_preferentialPay==="yes" ? "있음" : (state.answers.q7_preferentialPay==="no" ? "없음" : "-")}`);
+  lines.push(`주요원인: ${state.answers.q8_cause || "-"}`);
+  lines.push(`이력: ${state.answers.q9_history || "-"}`);
+  lines.push(`압류/추심: ${state.answers.q10_enforcement==="yes" ? "진행중" : (state.answers.q10_enforcement==="no" ? "없음" : "-")}`);
+  return lines.join("\n");
+}
+
+async function copyToClipboard(text){
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch(e) {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    return true;
+  }
+}
+
+function openMailto(rawTo, subject, body){
+  const to = sanitizeEmail(rawTo);
+  const url = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.open(url, "_self");
+}
+
+/** 버튼 이벤트(✅ null-safe) */
+on("saveLeadBtn","click", () => {
+  const r = saveLead();
+  if (!r.ok) { alert(r.msg); return; }
+  if ($("leadSavedHint")) $("leadSavedHint").style.display = "block";
+  alert("상담정보를 저장했습니다(이 기기에서만 저장).");
+});
+
+on("clearLeadBtn","click", () => {
+  clearLead();
+  alert("상담정보를 삭제했습니다.");
+});
+
+on("copyRequestBtn","click", async () => {
+  const name = String($("lead_name")?.value || "").trim();
+  const phone = normalizePhone($("lead_phone")?.value);
+  if (!name) { alert("이름을 입력해 주세요."); return; }
+  if (phone.length < 9) { alert("전화번호를 정확히 입력해 주세요."); return; }
+
+  const text = buildRequestText();
+  await copyToClipboard(text);
+  alert("상담 요청 내용을 복사했습니다. 카톡/문자/이메일에 붙여넣기 하세요.");
+});
+
+on("copyJsonBtn","click", async () => {
+  const text = $("jsonBox")?.textContent || "";
+  await copyToClipboard(text);
+  alert("JSON을 복사했습니다.");
+});
+
+on("sendEmailBtn","click", () => {
+  const name = String($("lead_name")?.value || "").trim();
+  const phone = normalizePhone($("lead_phone")?.value);
+
+  if (!name) { alert("이름을 입력해 주세요."); return; }
+  if (phone.length < 9) { alert("전화번호를 정확히 입력해 주세요."); return; }
+
+  alert("메일 작성창이 열립니다. 내용 확인 후 ‘전송’을 눌러야 접수됩니다.");
+
+  const subject = `[개인파산 상담신청] ${name} / ${phone}`;
+  const body = buildRequestText();
+  openMailto(OWNER_EMAIL, subject, body);
+});
+
+/** 네비 */
+on("backBtn","click", () => {
+  if (state.step > 0) { state.step--; renderStep(); }
+});
+
+on("nextBtn","click", () => {
+  const err = validateStep(state.step);
+  if (err) { setError(err); return; }
+  clearError();
+
+  if (state.step === steps.length - 1) { showResult(); return; }
+  state.step++;
+  renderStep();
+});
+
+on("resetBtn","click", () => {
+  state.step = 0;
+  state.answers = {
+    q1_insolvent: null,
+    q2_totalDebt: null,
+    q3_monthIncome: null,
+    q3_incomeType: "무소득",
+    q4_dependents: null,
+    q5_hasAssets: null,
+    q5_assetsTypes: [],
+    q5_assetsTotal: null,
+    q6_disposal: null,
+    q6_monthsAgo: null,
+    q6_disposalType: [],
+    q6_disposalAmount: null,
+    q7_preferentialPay: null,
+    q7_target: "가족·지인",
+    q7_amount: null,
+    q8_cause: "생활비 부족(소득감소/실직)",
+    q8_other: "",
+    q9_history: "없음",
+    q9_year: "",
+    q10_enforcement: null,
+    q10_types: []
+  };
+  if ($("statusPill")) $("statusPill").textContent = "준비됨";
+  renderStep();
+});
+
+/** ✅ init: 무조건 질문 렌더부터 */
+renderStep();
+</script>
+</body>
+</html>
